@@ -1,4 +1,4 @@
-# 슬라이드 설계 (Slide Plan) — 총 68장
+# 슬라이드 설계 (Slide Plan) — 총 79장
 
 > 이 표는 `build_pptx/slides_data.py`에서 자동 생성됩니다. 구성 변경 시 slides_data.py를 수정한 뒤 이 표를 갱신하세요.
 
@@ -39,39 +39,50 @@
 | 33 | one_liner | 1-3 정리 |
 | 34 | navy_divider | 실습 환경 점검과 안전한 AI 활용 기준 |
 | 35 | tree | 실습 자료 한눈에 보기 |
-| 36 | review | 지금 함께 점검합니다 |
-| 37 | card_grid | 절대 입력하지 않습니다 — 5가지 |
-| 38 | review | 붙여넣기 전, 30초 체크리스트 |
-| 39 | concept | 무료 계정 사용량, 현실적으로 씁니다 |
-| 40 | navy_divider | 실습 — 직접 만들어보는 업무 산출물 |
-| 41 | document | 실습 ① 회의록·자료 정리 자동화 |
-| 42 | code_demo | 실습 ① 프롬프트 |
-| 43 | code_demo | 실습 ① 이어서 요청하기 |
-| 44 | document | 실습 ① 이런 결과가 나오면 성공 |
-| 45 | one_liner | 실습 ① 정리 |
-| 46 | document | 실습 ② 보고서·이메일 초안 작성 |
-| 47 | code_demo | 실습 ② 프롬프트 |
-| 48 | process | 실습 ② 흐름 — 초안에서 완성까지 |
-| 49 | document | 실습 ② 이런 결과가 나오면 성공 |
-| 50 | one_liner | 실습 ② 정리 |
-| 51 | navy_divider | 유료·확장 기능 시연 — 자동화의 다음 단계 |
-| 52 | process | AI 업무 생산성의 발전 6단계 |
-| 53 | document | 시연 1 · Claude for Excel |
-| 54 | document | 시연 2 · Claude for PowerPoint |
-| 55 | document | 시연 3 · Claude for Word |
-| 56 | process | 시연 4 · MCP — AI를 업무 도구와 연결 |
-| 57 | document | 시연 5 · Skills — 반복 업무의 템플릿화 |
-| 58 | document | 시연 6 · Agentic Workflow — 스스로 일하는 AI |
-| 59 | document | 시연 7 · HWP 자동화의 가능성 (rhwp) |
-| 60 | one_liner | 2-3 정리 |
-| 61 | document | 나의 AI 업무 적용 시나리오 만들기 |
-| 62 | comparison | 줄일 업무 vs 줄이면 안 되는 업무 |
-| 63 | card_grid | 환각 대응 — AI 결과 검증 3원칙 |
-| 64 | card_grid | AI 시대에도 대체되기 어려운 역량 |
-| 65 | review | 내일 아침, 이렇게 시작해 보세요 |
-| 66 | wrap_up | 오늘 가져갈 3가지 |
-| 67 | navy_divider | 무엇이든 물어보세요 |
-| 68 | closing | 감사합니다 |
+| 36 | shot | 화면으로 보기 — Claude 가입·로그인 |
+| 37 | shot | 화면으로 보기 — 새 대화 시작 |
+| 38 | review | 지금 함께 점검합니다 |
+| 39 | card_grid | 절대 입력하지 않습니다 — 5가지 |
+| 40 | review | 붙여넣기 전, 30초 체크리스트 |
+| 41 | concept | 무료 계정 사용량, 현실적으로 씁니다 |
+| 42 | shot | 화면으로 보기 — 사용량 제한 안내 |
+| 43 | navy_divider | 실습 — 직접 만들어보는 업무 산출물 |
+| 44 | document | 실습 ① 회의록·자료 정리 자동화 |
+| 45 | code_demo | 실습 ① 프롬프트 |
+| 46 | shot | 화면으로 보기 — 실습 ① 실제 결과 |
+| 47 | code_demo | 실습 ① 이어서 요청하기 |
+| 48 | shot | 화면으로 보기 — Notion에 붙여넣은 모습 |
+| 49 | document | 실습 ① 이런 결과가 나오면 성공 |
+| 50 | one_liner | 실습 ① 정리 |
+| 51 | document | 실습 ② 보고서·이메일 초안 작성 |
+| 52 | code_demo | 실습 ② 프롬프트 |
+| 53 | shot | 화면으로 보기 — 실습 ② 실제 결과 |
+| 54 | process | 실습 ② 흐름 — 초안에서 완성까지 |
+| 55 | document | 실습 ② 이런 결과가 나오면 성공 |
+| 56 | one_liner | 실습 ② 정리 |
+| 57 | navy_divider | 유료·확장 기능 시연 — 자동화의 다음 단계 |
+| 58 | process | AI 업무 생산성의 발전 6단계 |
+| 59 | document | 시연 1 · Claude for Excel |
+| 60 | shot | Claude for Excel — 실제 화면 |
+| 61 | document | 시연 2 · Claude for PowerPoint |
+| 62 | shot | Claude for PowerPoint — 실제 화면 |
+| 63 | document | 시연 3 · Claude for Word |
+| 64 | shot | Claude for Word — 실제 화면 |
+| 65 | process | 시연 4 · MCP — AI를 업무 도구와 연결 |
+| 66 | shot | MCP 커넥터 — 실제 화면 |
+| 67 | document | 시연 5 · Skills — 반복 업무의 템플릿화 |
+| 68 | shot | Skills — 실제 화면 |
+| 69 | document | 시연 6 · Agentic Workflow — 스스로 일하는 AI |
+| 70 | document | 시연 7 · HWP 자동화의 가능성 (rhwp) |
+| 71 | one_liner | 2-3 정리 |
+| 72 | document | 나의 AI 업무 적용 시나리오 만들기 |
+| 73 | comparison | 줄일 업무 vs 줄이면 안 되는 업무 |
+| 74 | card_grid | 환각 대응 — AI 결과 검증 3원칙 |
+| 75 | card_grid | AI 시대에도 대체되기 어려운 역량 |
+| 76 | review | 내일 아침, 이렇게 시작해 보세요 |
+| 77 | wrap_up | 오늘 가져갈 3가지 |
+| 78 | navy_divider | 무엇이든 물어보세요 |
+| 79 | closing | 감사합니다 |
 
 ## 발표자 노트 정책
 

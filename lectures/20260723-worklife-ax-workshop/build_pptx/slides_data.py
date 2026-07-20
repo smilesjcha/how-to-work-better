@@ -562,6 +562,22 @@ SLIDES = [
         "speak_seconds": "3분",
     },
     {
+        "no": 27.1, "type": "shot", "title": "화면으로 보기 — Claude 가입·로그인",
+        "badge": "실제 화면",
+        "image": "free_01_signup.png",
+        "caption": "claude.ai 접속 → 'Google로 계속하기' 또는 이메일 링크 로그인 — 결제 정보는 필요 없습니다",
+        "note": "화면을 띄워둔 채 아직 가입 안 된 분들 따라오게 하기. 설문 기준 '계정 안내 필요' 1명, '처음 들어봄' 2명.",
+        "speak_seconds": "2분",
+    },
+    {
+        "no": 27.2, "type": "shot", "title": "화면으로 보기 — 새 대화 시작",
+        "badge": "실제 화면",
+        "image": "free_02_new_chat.png",
+        "caption": "로그인 후 첫 화면 — 아래 입력창에 붙여넣고 Enter, 오늘 실습의 전부입니다",
+        "note": "화면 구성(입력창·새 대화 버튼·응답 복사 버튼) 3가지만 짚어주기. 복잡한 메뉴는 오늘 안 씀.",
+        "speak_seconds": "2분",
+    },
+    {
         "no": 27.5, "type": "review", "title": "지금 함께 점검합니다",
         "lead": "4가지가 확인되면 실습 준비 완료입니다",
         "body": [
@@ -611,6 +627,14 @@ SLIDES = [
         ],
         "note": "메시지 수는 수요·프롬프트 길이에 따라 달라짐. '제한 도달=실패'가 아니라 설계된 폴백이 있다고 안심.",
         "speak_seconds": "3분",
+    },
+    {
+        "no": 39.5, "type": "shot", "title": "화면으로 보기 — 사용량 제한 안내",
+        "badge": "실제 화면",
+        "image": "free_06_usage_limit.png",
+        "caption": "이 메시지가 떠도 당황하지 않기 — 결과 예시 파일로 이어가고, 휴식 후 재시도하면 됩니다",
+        "note": "미리 보여주면 실습 중 만나도 패닉 없음. '언제 다시 되는지' 시각이 표시된다는 점 짚기.",
+        "speak_seconds": "1분",
     },
     # ---------------------------------------------------------------- 2부 실습
     {
@@ -678,6 +702,14 @@ SLIDES = [
         "speak_seconds": "실습 안내용",
     },
     {
+        "no": 42.5, "type": "shot", "title": "화면으로 보기 — 실습 ① 실제 결과",
+        "badge": "실제 화면",
+        "image": "free_03_meeting_result.png",
+        "caption": "무료 계정에서 실제로 나온 회의록 정리 결과 — 여러분 화면과 비교해 보세요",
+        "note": "결과 화면을 띄워두면 참여자가 '내 결과가 정상인지' 스스로 비교 가능 — 질문 절반이 줄어듦.",
+        "speak_seconds": "2분",
+    },
+    {
         "no": 34, "type": "code_demo", "title": "실습 ① 이어서 요청하기",
         "body": [
             "같은 대화에서 이어서 요청하면 맥락이 유지됩니다",
@@ -698,6 +730,14 @@ SLIDES = [
         ],
         "note": "설문 요청 'Notion 만들기' 해소 구간. 시간 여유 시 참여자 결과 1-2개 화면 공유.",
         "speak_seconds": "실습 안내용",
+    },
+    {
+        "no": 43.5, "type": "shot", "title": "화면으로 보기 — Notion에 붙여넣은 모습",
+        "badge": "실제 화면",
+        "image": "free_04_markdown_table.png",
+        "caption": "Claude의 Markdown 표를 Notion에 붙여넣으면 이렇게 표로 살아납니다",
+        "note": "복사 → Notion 붙여넣기 과정을 라이브로 한 번 보여주고, 이 화면으로 결과 확인.",
+        "speak_seconds": "2분",
     },
     {
         "no": 34.5, "type": "document", "title": "실습 ① 이런 결과가 나오면 성공",
@@ -781,6 +821,14 @@ SLIDES = [
         "code_highlight": {8, 9},
         "note": "'과장하지 않기'가 의외로 효과 큰 문구임을 언급.",
         "speak_seconds": "실습 안내용",
+    },
+    {
+        "no": 47.5, "type": "shot", "title": "화면으로 보기 — 실습 ② 실제 결과",
+        "badge": "실제 화면",
+        "image": "free_05_report_result.png",
+        "caption": "보고서 6개 섹션 + 이메일 버전까지 한 번의 요청으로 — 무료 계정 실제 결과",
+        "note": "대응안 비교표가 자동으로 표로 나오는 부분을 강조. 참여자 결과와 비교.",
+        "speak_seconds": "2분",
     },
     {
         "no": 38, "type": "process", "title": "실습 ② 흐름 — 초안에서 완성까지",
@@ -869,6 +917,14 @@ SLIDES = [
         "speak_seconds": "6분",
     },
     {
+        "no": 53.5, "type": "shot", "title": "Claude for Excel — 실제 화면",
+        "badge": "시연 화면",
+        "image": "paid_01_excel.png",
+        "caption": "Excel 창 안에서 Claude가 표를 읽고 계산 열과 인사이트를 추가하는 모습",
+        "note": "라이브 시연이 정상이면 이 슬라이드는 빠르게 넘기고, 실패 시 이 화면으로 대체 설명.",
+        "speak_seconds": "1분 (백업)",
+    },
+    {
         "no": 43, "type": "document", "title": "시연 2 · Claude for PowerPoint",
         "badge": "강사 시연",
         "body": [
@@ -894,6 +950,14 @@ SLIDES = [
         "speak_seconds": "5분",
     },
     {
+        "no": 54.5, "type": "shot", "title": "Claude for PowerPoint — 실제 화면",
+        "badge": "시연 화면",
+        "image": "paid_02_ppt.png",
+        "caption": "브리프에서 슬라이드 구성안과 발표자 노트가 생성되는 모습",
+        "note": "라이브 시연 정상 시 빠르게 통과, 실패 시 백업.",
+        "speak_seconds": "1분 (백업)",
+    },
+    {
         "no": 44, "type": "document", "title": "시연 3 · Claude for Word",
         "badge": "강사 시연",
         "body": [
@@ -917,6 +981,14 @@ SLIDES = [
         "speak_seconds": "4분",
     },
     {
+        "no": 55.5, "type": "shot", "title": "Claude for Word — 실제 화면",
+        "badge": "시연 화면",
+        "image": "paid_03_word.png",
+        "caption": "Word 문서 안에서 초안을 다듬고 확인 질문을 뽑아주는 모습",
+        "note": "라이브 시연 정상 시 빠르게 통과, 실패 시 백업.",
+        "speak_seconds": "1분 (백업)",
+    },
+    {
         "no": 45, "type": "process", "title": "시연 4 · MCP — AI를 업무 도구와 연결",
         "flow_items": ["내 파일·문서", "Notion · Drive · Slack", "MCP (연결 표준)", "Claude"],
         "emphasize_index": 2,
@@ -928,6 +1000,14 @@ SLIDES = [
         ],
         "note": "'복붙의 소멸'이라는 한 마디로 요약. 발전 6단계의 4단계 실증.",
         "speak_seconds": "3분",
+    },
+    {
+        "no": 56.5, "type": "shot", "title": "MCP 커넥터 — 실제 화면",
+        "badge": "시연 화면",
+        "image": "paid_04_mcp.png",
+        "caption": "Claude 설정의 커넥터 목록 — Drive·Notion 등 업무 도구가 연결된 모습",
+        "note": "연결 화면만 봐도 '복붙 없이 불러온다'는 개념이 잡힘.",
+        "speak_seconds": "1분 (백업)",
     },
     {
         "no": 45.1, "type": "document", "title": "시연 5 · Skills — 반복 업무의 템플릿화",
@@ -951,6 +1031,14 @@ SLIDES = [
         ],
         "note": "발전 6단계의 3단계 실증. '개인 노하우의 자산화'가 커리어 관점 메시지.",
         "speak_seconds": "4분",
+    },
+    {
+        "no": 57.5, "type": "shot", "title": "Skills — 실제 화면",
+        "badge": "시연 화면",
+        "image": "paid_05_skills.png",
+        "caption": "저장된 Skill 목록과 실행 화면 — 반복 업무 방식이 자산이 되는 모습",
+        "note": "라이브 시연 정상 시 빠르게 통과, 실패 시 백업.",
+        "speak_seconds": "1분 (백업)",
     },
     {
         "no": 45.2, "type": "document", "title": "시연 6 · Agentic Workflow — 스스로 일하는 AI",

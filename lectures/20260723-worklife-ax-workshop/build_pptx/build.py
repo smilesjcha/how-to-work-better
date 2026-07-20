@@ -34,6 +34,7 @@ TYPE_TO_FN = {
     "card_grid": L.make_card_grid,
     "comparison": L.make_comparison,
     "tree": L.make_tree,
+    "shot": L.make_shot,
 }
 
 

@@ -510,6 +510,67 @@ def make_comparison(prs, data):
     return slide
 
 
+# ---------------------------------------------------------------- Shot (스크린샷 슬라이드)
+
+def make_shot(prs, data):
+    """스크린샷 중심 슬라이드.
+
+    assets/screenshots/<image> 파일이 있으면 영역에 맞춰 자동 삽입,
+    없으면 파일명이 적힌 플레이스홀더를 그린다 (파일 추가 후 재빌드하면 자동 반영).
+    """
+    slide = _add_blank_slide(prs)
+    _add_title(slide, data["title"])
+    _title_rule(slide)
+    badge_text = data.get("badge")
+    if badge_text:
+        S.add_badge(slide, T.SLIDE_W - Inches(2.3), Inches(0.55),
+                    Inches(1.7), Inches(0.42), badge_text)
+    img_name = data.get("image", "")
+    img_path = os.path.join(ASSETS, "screenshots", img_name)
+    area_left = T.CONTENT_LEFT
+    area_top = Inches(1.75)
+    area_w = T.CONTENT_WIDTH
+    area_h = Inches(4.55)
+    caption = data.get("caption", "")
+    if os.path.exists(img_path):
+        try:
+            from PIL import Image as _Img
+            with _Img.open(img_path) as im:
+                iw, ih = im.size
+            scale = min(area_w / iw, area_h / ih)
+            w = int(iw * scale)
+            h = int(ih * scale)
+            left = int(area_left + (area_w - w) / 2)
+            top = int(area_top + (area_h - h) / 2)
+            pic = slide.shapes.add_picture(img_path, left, top,
+                                           width=w, height=h)
+            pic.line.color.rgb = T.GRAY_20
+            pic.line.width = Pt(0.75)
+        except Exception:
+            slide.shapes.add_picture(img_path, area_left, area_top,
+                                     width=area_w)
+    else:
+        S.add_rect(slide, area_left, area_top, area_w, area_h,
+                   fill=T.GRAY_5, line=T.GRAY_20, line_width=Pt(0.75))
+        S.add_textbox(slide, area_left, area_top + Inches(1.7), area_w,
+                      Inches(0.5),
+                      f"스크린샷 자리 — assets/screenshots/{img_name}",
+                      size=T.PT_BODY, color=T.GRAY_80, bold=True,
+                      align=PP_ALIGN.CENTER)
+        S.add_textbox(slide, area_left, area_top + Inches(2.3), area_w,
+                      Inches(0.5),
+                      "파일 저장 후 python3 build_pptx/build.py 재실행하면 자동 삽입됩니다",
+                      size=T.PT_CAPTION, color=T.GRAY_80,
+                      align=PP_ALIGN.CENTER)
+    if caption:
+        S.add_textbox(slide, area_left, Inches(6.45), area_w, Inches(0.5),
+                      caption, size=T.PT_BODY_SM, color=T.GRAY_80,
+                      align=PP_ALIGN.CENTER)
+    _attach_note(slide, data)
+    _add_footer(slide, data["no"])
+    return slide
+
+
 # ---------------------------------------------------------------- Tree (folder)
 
 def make_tree(prs, data):
