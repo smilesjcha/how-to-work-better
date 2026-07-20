@@ -39,5 +39,8 @@
 ## 5. Git 규약
 
 - 기본 브랜치 `main`에 직접 커밋 가능(1인 레포).
+- **push 전 계정 확인**: 이 레포의 원격은 개인 계정(`smilesjcha`) 소유다. 이 머신의 gh 기본 계정은
+  `sungjaecha-musinsa`이므로 push 시 `gh auth switch --user smilesjcha` 후 push하고,
+  끝나면 `gh auth switch --user sungjaecha-musinsa`로 되돌린다.
 - 커밋 메시지: 한국어 요약 한 줄 + 필요시 본문. 산출물 재생성 커밋은 `build:` 접두사.
 - 대용량 원본(동영상 등)은 커밋하지 않는다. PPTX/PDF/ZIP 산출물은 허용.
