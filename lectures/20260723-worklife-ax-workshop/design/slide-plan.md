@@ -1,84 +1,77 @@
-# 슬라이드 설계 (Slide Plan) — 총 53장
+# 슬라이드 설계 (Slide Plan) — 총 68장
 
-> 이 문서가 `build_pptx/slides_data.py`의 원본 설계다. 구성 변경 시 이 문서를 먼저 수정한다.
+> 이 표는 `build_pptx/slides_data.py`에서 자동 생성됩니다. 구성 변경 시 slides_data.py를 수정한 뒤 이 표를 갱신하세요.
 
-## 오프닝 (1–6)
-
-| # | 타입 | 제목/내용 |
+| # | 타입 | 제목 |
 | --- | --- | --- |
-| 1 | cover | AI 시대의 업무 경쟁력과 생산성 향상 — 부제·일시·강사 (KEDI 표지 벤치마크) |
-| 2 | toc | 목차: 1부 4개 세션 + 2부 5개 세션 |
-| 3 | one_liner | 오늘의 핵심 질문: "AX 시대에 나는 어떻게 일하고 성장할 것인가?" |
-| 4 | profile | 강사 소개: 무신사 Agentic AI PM, 겸임교수, 금융→의료→교육→커머스 AI 경력, 『딥러닝의 정석』 역자 |
-| 5 | comparison | 이 교육이 다루는 것 vs 다루지 않는 것 (도구 기능 암기 X / 일하는 방식 O) |
-| 6 | card_grid | 사전 설문으로 본 우리: 8명 분포·배우고 싶은 것 Top3·수준 다양성 → 오늘의 운영 방식 |
-
-## 1부 (7–27)
-
-| # | 타입 | 제목/내용 |
-| --- | --- | --- |
-| 7 | navy_divider | 1부. AX 시대의 업무 변화와 AI 활용 관점 |
-| 8 | schedule | 오늘의 시간표 (1부/2부 전체) |
-| 9 | navy_divider | 1-1. AX 시대, 직장인의 일은 어떻게 바뀌는가 |
-| 10 | concept | 생성형 AI 확산과 업무환경 변화 (AX 정의) |
-| 11 | comparison | AI가 빠르게 줄이는 업무 vs 사람이 계속 책임지는 업무 |
-| 12 | card_grid | 초기 재직자에게 요구되는 역량 변화 4가지 |
-| 13 | one_liner | 메시지: AI는 일을 없애기보다, 반복 업무를 줄이고 판단·소통·문제해결의 중요성을 높인다 |
-| 14 | navy_divider | 1-2. 업무 목적별 AI 도구 활용 지도 |
-| 15 | card_grid | 도구 지도: 자료조사/문서 작성/협업 정리/표·산출물 |
-| 16 | concept | 왜 오늘은 Claude로 실습하는가 (대표 도구 + 무료/유료 경계 설명) |
-| 17 | one_liner | 메시지: 중요한 것은 특정 도구가 아니라 업무 목적에 맞는 활용 방식 |
-| 18 | navy_divider | 1-3. AI를 잘 쓰는 사람의 업무 방식 |
-| 19 | comparison | 나쁜 프롬프트 vs 좋은 프롬프트 (KEDI S35 "질문을 제대로 했나요?" 연결) |
-| 20 | card_grid | 프롬프트 5요소: 역할·목적·맥락·산출물 형식·검토 기준 |
-| 21 | process | C.O.R.E 프레임워크 (Context→Output→Reference→Example, KEDI S38 벤치마크) |
-| 22 | comparison | 기법 Before→After: 쿠션어 제거·긍정문 명령·구분자 활용 (KEDI S43–47 벤치마크) |
-| 23 | code_demo | Markdown 표·체크리스트·보고서 구조를 요청하는 법 |
-| 24 | process | 결과를 그대로 쓰지 않는다: 초안→검토→수정 요청 루프 |
-| 25 | one_liner | 메시지: 잘 쓰는 사람 = 업무 목적과 산출물 기준을 명확히 정의하는 사람 |
-| 26 | navy_divider | 1-4. 실습 환경 점검과 안전한 AI 활용 기준 |
-| 27 | tree | 실습 ZIP 폴더 구조 안내 + 접속 점검 순서 |
-
-## 1부 보안·실습 준비 (28–30)
-
-| # | 타입 | 제목/내용 |
-| --- | --- | --- |
-| 28 | card_grid | 절대 입력 금지 5가지 (개인정보·고객정보·기업정보·보안자료·타인 저작물) |
-| 29 | review | 입력 전 30초 체크리스트 (사람·회사·고객·권한) + 치환 예시 |
-| 30 | concept | 무료 계정 사용량 제한과 대응 (5시간 재설정, 한 번에 완성 프롬프트, 예시 파일 폴백) |
-
-## 2부 실습 (31–40)
-
-| # | 타입 | 제목/내용 |
-| --- | --- | --- |
-| 31 | navy_divider | 2부. 실습과 확장 — 휴식 후 시작 |
-| 32 | document | 실습 ① 개요: 목적·입력·산출물·Notion 활용 (좌 설명 + 우 진행 3단계) |
-| 33 | code_demo | 실습 ① 프롬프트 (회의록 정리) |
-| 34 | code_demo | 실습 ① 이어서 요청: 3줄 요약·Markdown 표 변환 |
-| 35 | one_liner | 메시지: AI는 정보를 업무 판단에 필요한 형태로 재구성하는 도구다 |
-| 36 | document | 실습 ② 개요: 업무 상황→보고서→이메일 |
-| 37 | code_demo | 실습 ② 프롬프트 (보고서·이메일) |
-| 38 | process | 실습 ② 흐름: 상황 정리→보고서 초안→이메일 변환→톤 수정 |
-| 39 | one_liner | 메시지: AI는 초안을 만들고, 사람은 맥락·정확성·관계성을 보정한다 |
-| 40 | navy_divider | 2-3. 유료·확장 기능 시연 — AI 업무 자동화의 다음 단계 |
-
-## 2부 시연·정리 (41–52)
-
-| # | 타입 | 제목/내용 |
-| --- | --- | --- |
-| 41 | process | AI 업무 생산성 발전 6단계 (Chat→문서 생성→Skills→MCP→Office 내장→Agentic) |
-| 42 | document | 시연 1 — Claude for Excel: 표를 읽고 계산하고 의미를 정리 |
-| 43 | document | 시연 2 — Claude for PowerPoint: 자료를 메시지와 발표 흐름으로 |
-| 44 | document | 시연 3 — Claude for Word: 논리와 표현을 함께 다듬기 |
-| 45 | document | 시연 4 — MCP/Skills: 복붙 도구에서 연결형 업무 파트너로 |
-| 46 | document | 시연 5 — rhwp/HWP: 국내 문서 자동화의 가능성 (검증 전제) |
-| 47 | one_liner | 메시지: 무료 AI는 초안을 돕고, 유료·연동형 AI는 흐름까지 확장한다 |
-| 48 | document | 2-4. 나의 AI 업무 적용 시나리오 작성 (템플릿 안내 + 작성 기준) |
-| 49 | comparison | AI로 줄일 업무 vs 줄이면 안 되는 업무 |
-| 50 | card_grid | 2-5. 환각 대응 — AI 결과 검증 3원칙 |
-| 51 | card_grid | AI 시대에도 대체되기 어려운 역량 4가지 |
-| 52 | wrap_up | 오늘 가져갈 3가지 |
-| 53 | closing | Q&A · 연락처 · 감사 (KEDI S95·100 벤치마크) |
+| 1 | cover | AI 시대의 업무 경쟁력과 생산성 향상 |
+| 2 | toc | 목차 |
+| 3 | one_liner | 오늘의 핵심 질문 |
+| 4 | profile | 강사 소개 |
+| 5 | process | 커리어 방향성 — AI 기술의 흐름을 따라 |
+| 6 | card_grid | 강의 이력 — 이런 주제로 강의해 왔습니다 |
+| 7 | comparison | 이 교육이 다루는 것 |
+| 8 | card_grid | 사전 설문으로 본 오늘의 참여자 |
+| 9 | navy_divider | AX 시대의 업무 변화와 AI 활용 관점 |
+| 10 | schedule | 오늘의 시간표 |
+| 11 | navy_divider | AX 시대, 직장인의 일은 어떻게 바뀌는가 |
+| 12 | concept | 생성형 AI 확산과 업무환경의 변화 |
+| 13 | card_grid | 우리 주변의 AX 장면들 |
+| 14 | comparison | 줄어드는 일, 남는 일 |
+| 15 | card_grid | 초기 재직자에게 요구되는 역량의 변화 |
+| 16 | one_liner | 1-1 정리 |
+| 17 | navy_divider | 업무 목적별 AI 도구 활용 지도 |
+| 18 | card_grid | 업무 목적별 AI 도구 지도 |
+| 19 | concept | 도구를 고르는 4가지 기준 |
+| 20 | concept | 왜 오늘은 Claude로 실습하나요? |
+| 21 | one_liner | 1-2 정리 |
+| 22 | navy_divider | AI를 잘 쓰는 사람의 업무 방식 |
+| 23 | comparison | 질문을 제대로 했나요? |
+| 24 | card_grid | 프롬프트에 넣어야 할 6가지 |
+| 25 | process | 기억하기 쉬운 틀 — C.O.R.E |
+| 26 | comparison | 기법 ① 쿠션어를 쓰지 않습니다 |
+| 27 | comparison | 기법 ② 부정문 대신 긍정문으로 |
+| 28 | code_demo | 기법 ③ 구분자로 구조를 만듭니다 |
+| 29 | code_demo | 기법 ④ 역할을 부여합니다 |
+| 30 | card_grid | 자주 하는 실수 3가지 |
+| 31 | code_demo | Markdown으로 받으면 바로 씁니다 |
+| 32 | process | 결과물을 그대로 쓰지 않습니다 |
+| 33 | one_liner | 1-3 정리 |
+| 34 | navy_divider | 실습 환경 점검과 안전한 AI 활용 기준 |
+| 35 | tree | 실습 자료 한눈에 보기 |
+| 36 | review | 지금 함께 점검합니다 |
+| 37 | card_grid | 절대 입력하지 않습니다 — 5가지 |
+| 38 | review | 붙여넣기 전, 30초 체크리스트 |
+| 39 | concept | 무료 계정 사용량, 현실적으로 씁니다 |
+| 40 | navy_divider | 실습 — 직접 만들어보는 업무 산출물 |
+| 41 | document | 실습 ① 회의록·자료 정리 자동화 |
+| 42 | code_demo | 실습 ① 프롬프트 |
+| 43 | code_demo | 실습 ① 이어서 요청하기 |
+| 44 | document | 실습 ① 이런 결과가 나오면 성공 |
+| 45 | one_liner | 실습 ① 정리 |
+| 46 | document | 실습 ② 보고서·이메일 초안 작성 |
+| 47 | code_demo | 실습 ② 프롬프트 |
+| 48 | process | 실습 ② 흐름 — 초안에서 완성까지 |
+| 49 | document | 실습 ② 이런 결과가 나오면 성공 |
+| 50 | one_liner | 실습 ② 정리 |
+| 51 | navy_divider | 유료·확장 기능 시연 — 자동화의 다음 단계 |
+| 52 | process | AI 업무 생산성의 발전 6단계 |
+| 53 | document | 시연 1 · Claude for Excel |
+| 54 | document | 시연 2 · Claude for PowerPoint |
+| 55 | document | 시연 3 · Claude for Word |
+| 56 | process | 시연 4 · MCP — AI를 업무 도구와 연결 |
+| 57 | document | 시연 5 · Skills — 반복 업무의 템플릿화 |
+| 58 | document | 시연 6 · Agentic Workflow — 스스로 일하는 AI |
+| 59 | document | 시연 7 · HWP 자동화의 가능성 (rhwp) |
+| 60 | one_liner | 2-3 정리 |
+| 61 | document | 나의 AI 업무 적용 시나리오 만들기 |
+| 62 | comparison | 줄일 업무 vs 줄이면 안 되는 업무 |
+| 63 | card_grid | 환각 대응 — AI 결과 검증 3원칙 |
+| 64 | card_grid | AI 시대에도 대체되기 어려운 역량 |
+| 65 | review | 내일 아침, 이렇게 시작해 보세요 |
+| 66 | wrap_up | 오늘 가져갈 3가지 |
+| 67 | navy_divider | 무엇이든 물어보세요 |
+| 68 | closing | 감사합니다 |
 
 ## 발표자 노트 정책
 

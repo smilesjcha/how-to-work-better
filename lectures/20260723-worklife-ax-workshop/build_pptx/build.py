@@ -43,11 +43,12 @@ def build():
     prs.slide_width = T.SLIDE_W
     prs.slide_height = T.SLIDE_H
 
-    for data in SLIDES:
+    for i, data in enumerate(SLIDES, start=1):
+        data["no"] = i  # 슬라이드 번호는 순서 기준 자동 부여 (수동 no는 무시)
         fn = TYPE_TO_FN.get(data.get("type"))
         if fn is None:
             raise ValueError(f"Unknown slide type {data.get('type')!r} "
-                             f"(slide {data.get('no')})")
+                             f"(slide {i})")
         fn(prs, data)
 
     out_dir = os.path.abspath(os.path.join(HERE, "..", "output"))

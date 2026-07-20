@@ -177,9 +177,17 @@ def make_profile(prs, data):
     right_w = T.CONTENT_WIDTH - Inches(5.15)
     S.add_textbox(slide, right_left, Inches(1.85), right_w, Inches(0.5),
                   data.get("name_line", ""),
-                  size=Pt(21), bold=True, color=T.DEEP_BLUE)
+                  size=Pt(24), bold=True, color=T.BLACK)
+    career_top = Inches(2.55)
+    role_lines = data.get("role_lines", [])
+    if role_lines:
+        S.add_multi_line_textbox(
+            slide, right_left, Inches(2.45), right_w, Inches(0.9),
+            role_lines, size=Pt(17), bold=True, color=T.DEEP_BLUE,
+            line_spacing=1.4)
+        career_top = Inches(3.4)
     S.add_multi_line_textbox(
-        slide, right_left, Inches(2.55), right_w, Inches(4.4),
+        slide, right_left, career_top, right_w, Inches(3.5),
         data.get("career_lines", []),
         size=T.PT_BODY_SM, color=T.BLACK, line_spacing=1.5)
     _attach_note(slide, data)

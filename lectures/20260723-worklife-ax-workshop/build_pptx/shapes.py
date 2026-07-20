@@ -60,7 +60,9 @@ def add_multi_line_textbox(slide, left, top, width, height, lines, *,
         p.alignment = align
         p.line_spacing = line_spacing
         run = p.add_run()
-        run.text = (("• " if bullet else "") + line)
+        # 빈 줄·이어지는 줄(→/공백 시작)에는 불릿을 붙이지 않는다
+        use_bullet = bullet and line and not line.startswith(("→", " "))
+        run.text = (("• " if use_bullet else "") + line)
         set_run_font(run, size=size or T.PT_BODY, bold=bold,
                      color=color or T.BLACK, name=name)
     return tb
