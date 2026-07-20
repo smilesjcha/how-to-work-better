@@ -63,11 +63,11 @@
 | 57 | navy_divider | 유료·확장 기능 시연 — 자동화의 다음 단계 |
 | 58 | process | AI 업무 생산성의 발전 6단계 |
 | 59 | document | 시연 1 · Claude for Excel |
-| 60 | shot | Claude for Excel — 실제 화면 |
+| 60 | shot | 표 데이터 분석 — 실제 화면 |
 | 61 | document | 시연 2 · Claude for PowerPoint |
-| 62 | shot | Claude for PowerPoint — 실제 화면 |
+| 62 | shot | 발표자료 구성안 생성 — 실제 화면 |
 | 63 | document | 시연 3 · Claude for Word |
-| 64 | shot | Claude for Word — 실제 화면 |
+| 64 | shot | 보고서 초안 다듬기 — 실제 화면 |
 | 65 | process | 시연 4 · MCP — AI를 업무 도구와 연결 |
 | 66 | shot | MCP 커넥터 — 실제 화면 |
 | 67 | document | 시연 5 · Skills — 반복 업무의 템플릿화 |
