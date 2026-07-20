@@ -8,10 +8,10 @@
 ## 무료 계정 (별도 Gmail Chrome 프로필) — 사용자 직접 캡처
 
 - [ ] `free_01_signup.png` — claude.ai 로그인 화면
-- [ ] `free_02_new_chat.png` — 새 대화 화면
-- [ ] `free_03_meeting_result.png` — 실습 ① 결과 (필수)
-- [ ] `free_04_markdown_table.png` — Notion에 붙여넣은 표
-- [ ] `free_05_report_result.png` — 실습 ② 결과 (필수)
+- [x] `free_02_new_chat.png` — 새 대화 화면
+- [x] `free_03_meeting_result.png` — 실습 ① 결과 (필수)
+- [x] `free_04_markdown_table.png` — Notion에 붙여넣은 표
+- [x] `free_05_report_result.png` — 실습 ② 결과 (필수)
 - [ ] `free_06_usage_limit.png` — 사용량 제한 안내
 
 ## 유료·시연 (강사 계정) — 백업 겸용
