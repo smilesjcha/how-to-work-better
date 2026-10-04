@@ -21,6 +21,6 @@
 python3 lectures/20261007-daeryzen-ai-office/build_pptx/build.py
 ```
 
-내용은 `build_pptx/slides_data.py`, 디자인 토큰은 `build_pptx/theme.py`와 `design/ppt-design-system.md`에서 관리합니다. 실습 데이터는 가상 회사 「한빛유업」의 교육용 수치입니다. 실제 개인정보·고객정보·회사 내부정보를 입력하지 마세요.
+내용은 `build_pptx/slides_data.py`, 구성 선택은 `build_pptx/composition.py`, 디자인 토큰은 `build_pptx/theme.py`와 `design/ppt-design-system.md`에서 관리합니다. 공통 제작 기준은 [`docs/harness/ppt-production-playbook.md`](../../docs/harness/ppt-production-playbook.md)에 있습니다. 실습 데이터는 가상 회사 「한빛유업」의 교육용 수치입니다. 실제 개인정보·고객정보·회사 내부정보를 입력하지 마세요.
 
 심화 실습용 `materials/01-data/weekly-ops-sample.csv`는 월별 요약과 합계가 일치하는 24행 가상 운영 원장입니다. PPT의 작업 흐름은 편집 가능한 도형으로 구성했고, 대응 Mermaid 원문은 `design/`에 있습니다.

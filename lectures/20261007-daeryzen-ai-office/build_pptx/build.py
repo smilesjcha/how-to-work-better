@@ -7,6 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import theme as T
 import layouts as L
+from composition import choose, repetition_report
 from slides_data import SLIDES
 
 def build():
@@ -14,6 +15,9 @@ def build():
     prs = Presentation()
     prs.slide_width, prs.slide_height = T.W, T.H
     L.TOTAL = len(SLIDES)
+    log = choose(SLIDES)
+    repeated = repetition_report(log)
+    assert not repeated, f'연속 레이아웃 반복: {repeated}'
     for index, data in enumerate(SLIDES, 1):
         data['no'] = index
         try:
@@ -24,7 +28,7 @@ def build():
     os.makedirs(output_dir, exist_ok=True)
     output = os.path.join(output_dir, 'daeryzen-ai-office-20261007.pptx')
     prs.save(output)
-    print(f'{output}: {len(prs.slides)} slides')
+    print(f'{output}: {len(prs.slides)} slides, {len(set(row[3] for row in log))} compositions')
     return output
 
 if __name__ == '__main__':

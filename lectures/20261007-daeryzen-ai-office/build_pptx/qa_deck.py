@@ -5,6 +5,7 @@ from collections import Counter
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 from slides_data import SLIDES
+from composition import choose, repetition_report
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PPTX = os.path.join(ROOT, 'output', 'daeryzen-ai-office-20261007.pptx')
@@ -14,6 +15,7 @@ OUT = os.path.join(ROOT, 'output', 'qa-contact')
 def inspect():
     prs = Presentation(PPTX)
     assert len(prs.slides) == len(SLIDES)
+    log = choose(SLIDES)
     titles = []
     issues = []
     sizes = []
@@ -34,9 +36,16 @@ def inspect():
     duplicates = [k for k, n in Counter(titles).items() if n > 1]
     if duplicates:
         issues.append(f'제목 중복: {duplicates}')
-    print(f'slides={len(prs.slides)}; min_font={min(sizes):.1f}pt; duplicate_titles={len(duplicates)}; issues={len(issues)}')
+    repeated = repetition_report(log)
+    if repeated:
+        issues.append(f'연속 구성 반복: {repeated}')
+    compositions = Counter(row[3] for row in log)
+    print(f'slides={len(prs.slides)}; compositions={len(compositions)}; '
+          f'min_font={min(sizes):.1f}pt; duplicate_titles={len(duplicates)}; issues={len(issues)}')
+    print('composition_counts=' + ', '.join(f'{k}:{v}' for k,v in sorted(compositions.items())))
     for issue in issues:
         print(issue)
+    assert not issues, 'PPTX 기본 품질 검사 실패'
 
 def contact():
     os.makedirs(OUT, exist_ok=True)
