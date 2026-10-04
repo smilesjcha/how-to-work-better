@@ -5,28 +5,29 @@ from pptx.util import Inches, Pt
 def rgb(value):
     return RGBColor.from_string(value.lstrip('#'))
 
-NAVY = rgb('0B1F3A')
-INK = rgb('17212B')
-BLUE = rgb('1F5DA8')
-PALE = rgb('EAF1F8')
-SURFACE = rgb('F2F5F7')
+NAVY = rgb('101B2A')
+INK = rgb('17191C')
+BLUE = rgb('17324D')
+PALE = rgb('E9EDF0')
+SURFACE = rgb('F5F6F5')
 WHITE = rgb('FFFFFF')
-LINE = rgb('CDD6DE')
-MUTED = rgb('566575')
+LINE = rgb('D9DDDE')
+MUTED = rgb('62686B')
 ERROR = rgb('B42318')
-GOOD = rgb('187457')
-WARM = rgb('F4C677')
+GOOD = rgb('006C50')
+WARM = rgb('79B099')
 
-FONT = 'Apple SD Gothic Neo'
+FONT = 'NanumGothic'
 MONO = 'Menlo'
-COVER = Pt(38)
-TITLE = Pt(30)
-LEAD = Pt(24)
-BODY = Pt(19)
-BODY_SM = Pt(18)
-TABLE = Pt(16)
-CAPTION = Pt(11)
+COVER = Pt(40)
+TITLE = Pt(31)
+LEAD = Pt(22)
+BODY = Pt(20)
+BODY_SM = Pt(19)
+TABLE = Pt(18)
+CAPTION = Pt(10.5)
 PAGE = Pt(10)
+CORNER = .14
 
 W = Inches(13.333)
 H = Inches(7.5)
@@ -49,7 +50,7 @@ PANEL_GAP = Inches(.20)
 COL_W = (CW-GAP)/2
 THIRD_W = (CW-2*GAP)/3
 TABLE_PAD = Inches(.08)
-BODY_LINES = 1.15
+BODY_LINES = 1.12
 
 # 레이아웃 전용 기하값
 COVER_KICKER_Y = Inches(.88)

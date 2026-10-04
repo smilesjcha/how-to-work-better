@@ -8,7 +8,8 @@
 2. `01-data/july-targets.csv`의 목표와 실적을 비교합니다.
 3. `01-data/metric-guide.md`로 계산식을 확인하고 `01-data/prompts.md`의 요청을 웹 AI에 붙여 넣습니다.
 4. 수치가 다르면 계산기로 확인한 뒤 `01-data/expected-summary.md`와 대조합니다.
-5. 같은 값을 엑셀 형식으로 보고 싶으면 `01-data/training-data.xlsx`를 엽니다. `Summary`는 계산 결과, `Inputs`는 원자료입니다.
+5. 같은 값을 엑셀 형식으로 보고 싶으면 `01-data/training-data.xlsx`를 엽니다. `Summary`는 계산 결과, `Inputs`는 월별 원자료입니다.
+6. 빠르게 마친 분은 `01-data/weekly-ops-sample.csv`의 24행을 월별로 합산합니다. 엑셀의 `Weekly detail` 시트와 `Summary` 하단의 차이 검산을 참고하세요. 이 자료는 심화용이며 필수 실습 범위는 아닙니다.
 
 ## 15:40–17:10 · 실습 B·C
 

@@ -55,6 +55,19 @@ def rect(slide, x, y, w, h, fill=T.WHITE, line=None):
     clean_effects(s)
     return s
 
+def soft_rect(slide, x, y, w, h, fill=T.SURFACE, outline=None):
+    s = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, int(x), int(y), int(w), int(h))
+    s.adjustments[0] = T.CORNER
+    s.fill.solid()
+    s.fill.fore_color.rgb = fill
+    if outline is None:
+        s.line.fill.background()
+    else:
+        s.line.color.rgb = outline
+        s.line.width = T.STROKE
+    clean_effects(s)
+    return s
+
 def line(slide, x, y, w, color=T.LINE, weight=T.STROKE):
     s = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, int(x), int(y), int(x+w), int(y))
     s.line.color.rgb = color
@@ -62,19 +75,21 @@ def line(slide, x, y, w, color=T.LINE, weight=T.STROKE):
     clean_effects(s)
 
 def panel(slide, x, y, w, h, heading, body, highlight=False):
-    rect(slide, x, y, w, h, T.PALE if highlight else T.WHITE, T.BLUE if highlight else T.LINE)
-    textbox(slide, x+T.PAD, y+T.PAD, w-2*T.PAD, T.PANEL_TITLE_H, heading, T.BODY, T.BLUE if highlight else T.INK, True)
-    line(slide, x+T.PAD, y+T.PANEL_TITLE_H+T.PAD, w-2*T.PAD)
+    soft_rect(slide, x, y, w, h, T.PALE if highlight else T.SURFACE)
+    if highlight:
+        rect(slide, x, y+T.PAD, T.RULE_THICK, h-2*T.PAD, T.GOOD)
+    textbox(slide, x+T.PAD, y+T.PAD, w-2*T.PAD, T.PANEL_TITLE_H, heading, T.BODY, T.GOOD if highlight else T.INK, True)
+    line(slide, x+T.PAD, y+T.PANEL_TITLE_H+T.PAD, w-2*T.PAD, T.LINE)
     textbox(slide, x+T.PAD, y+T.PANEL_TITLE_H+2*T.PAD, w-2*T.PAD, h-T.PANEL_TITLE_H-3*T.PAD,
             body, T.BODY_SM, anchor=MSO_ANCHOR.MIDDLE)
 
 def slide_base(prs, d, dark=False):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     s.background.fill.solid()
-    s.background.fill.fore_color.rgb = T.NAVY if dark else T.WHITE
+    s.background.fill.fore_color.rgb = T.INK if dark else T.WHITE
     if not dark:
         textbox(s, T.MX, T.HEADER_Y, T.CW, T.HEADER_H, d['title'], T.TITLE, T.INK, True)
-        line(s, T.MX, T.RULE_Y, T.RULE_W, T.BLUE, T.RULE_THICK)
+        line(s, T.MX, T.RULE_Y, T.RULE_W, T.GOOD, T.RULE_THICK)
     footer_color = T.PALE if dark else T.MUTED
     textbox(s, T.MX, T.FOOTER_Y, T.CW, T.FOOTER_H,
             d.get('phase', '데어리젠 AI 실무교육'), T.CAPTION, footer_color)
@@ -85,7 +100,8 @@ def slide_base(prs, d, dark=False):
     return s
 
 def put_lead(s, d):
-    textbox(s, T.MX, T.LEAD_Y, T.CW, T.LEAD_H, d.get('lead', ''), T.LEAD, T.BLUE, True)
+    if d.get('lead'):
+        textbox(s, T.MX, T.LEAD_Y, T.CW, T.LEAD_H, d['lead'], T.LEAD, T.MUTED)
 
 def put_bottom(s, d):
     if d.get('bottom'):
@@ -93,10 +109,10 @@ def put_bottom(s, d):
 
 def cover(prs, d):
     s = slide_base(prs, d, True)
-    textbox(s, T.MX, T.COVER_KICKER_Y, T.CW, T.PANEL_TITLE_H, '데어리젠 AI 실무교육 · 2026.10.07', T.BODY, T.WARM, True)
+    textbox(s, T.MX, T.COVER_KICKER_Y, T.CW, T.PANEL_TITLE_H, 'DAERYZEN  /  AI OFFICE WORKSHOP', T.BODY, T.WARM, True)
     textbox(s, T.MX, T.COVER_TITLE_Y, T.CW, T.SECTION_TITLE_Y, d['title'], T.COVER, T.WHITE, True)
     textbox(s, T.MX, T.COVER_SUB_Y, T.CW, T.LEAD_H*2, d['lead'], T.LEAD, T.PALE)
-    line(s, T.MX, T.COVER_META_Y-T.GAP, T.CW, T.WARM, T.RULE_THICK)
+    line(s, T.MX, T.COVER_META_Y-T.GAP, T.CW, T.GOOD, T.RULE_THICK)
     textbox(s, T.MX, T.COVER_META_Y, T.CW, T.LEAD_H, d['bottom'], T.BODY_SM, T.WHITE)
     return s
 
@@ -111,16 +127,29 @@ def triad(prs, d):
     s = slide_base(prs, d)
     put_lead(s, d)
     for i, (heading, body) in enumerate(d['cards']):
-        x = T.MX+i*(T.THIRD_W+T.GAP)
-        panel(s, x, T.BLOCK_Y, T.THIRD_W, T.BLOCK_H, heading, body, i==d.get('focus', -1))
+        row_h = T.BLOCK_H/len(d['cards'])
+        y = T.BLOCK_Y+i*row_h
+        if i:
+            line(s, T.MX, y, T.CW, T.LINE)
+        textbox(s, T.MX, y+T.PAD, T.RULE_W, row_h-T.PAD, f'{i+1:02d}', T.BODY, T.GOOD, True)
+        textbox(s, T.MX+T.RULE_W, y+T.PAD, T.CHART_LABEL_W-T.RULE_W, row_h-T.PAD,
+                heading, T.BODY, T.INK, True, anchor=MSO_ANCHOR.MIDDLE)
+        textbox(s, T.MX+T.CHART_LABEL_W+T.GAP, y+T.PAD, T.CW-T.CHART_LABEL_W-T.GAP,
+                row_h-T.PAD, body, T.BODY_SM, T.MUTED, anchor=MSO_ANCHOR.MIDDLE)
     put_bottom(s, d)
     return s
 
 def compare(prs, d):
     s = slide_base(prs, d)
     put_lead(s, d)
-    panel(s, T.MX, T.BLOCK_Y, T.COL_W, T.BLOCK_H, d['left'][0], d['left'][1], False)
-    panel(s, T.MX+T.COL_W+T.GAP, T.BLOCK_Y, T.COL_W, T.BLOCK_H, d['right'][0], d['right'][1], True)
+    left_x = T.MX
+    right_x = T.MX+T.COL_W+T.GAP
+    line(s, left_x, T.BLOCK_Y, T.COL_W, T.LINE)
+    line(s, right_x, T.BLOCK_Y, T.COL_W, T.GOOD, T.RULE_THICK)
+    textbox(s, left_x, T.BLOCK_Y+T.PAD, T.COL_W, T.PANEL_TITLE_H, d['left'][0], T.BODY, T.MUTED, True)
+    textbox(s, right_x, T.BLOCK_Y+T.PAD, T.COL_W, T.PANEL_TITLE_H, d['right'][0], T.BODY, T.GOOD, True)
+    textbox(s, left_x, T.PANEL_BODY_Y, T.COL_W-T.PAD, T.PANEL_BODY_H, d['left'][1], T.BODY_SM)
+    textbox(s, right_x, T.PANEL_BODY_Y, T.COL_W-T.PAD, T.PANEL_BODY_H, d['right'][1], T.BODY_SM)
     put_bottom(s, d)
     return s
 
@@ -134,7 +163,7 @@ def chart(prs, d):
         textbox(s, T.MX, y, T.CHART_LABEL_W, T.CHART_ROW_H, label, T.BODY_SM)
         rect(s, T.MX+T.CHART_LABEL_W, y+T.GAP/2, T.CHART_BAR_W, T.CHART_BAR_H, T.SURFACE)
         if number:
-            rect(s, T.MX+T.CHART_LABEL_W, y+T.GAP/2, T.CHART_BAR_W*number/peak, T.CHART_BAR_H, T.BLUE)
+            rect(s, T.MX+T.CHART_LABEL_W, y+T.GAP/2, T.CHART_BAR_W*number/peak, T.CHART_BAR_H, T.GOOD if i==0 else T.BLUE)
         textbox(s, T.MX+T.CHART_LABEL_W+T.CHART_BAR_W+T.GAP, y, T.CHART_NUM_W, T.CHART_ROW_H,
                 f"{number}{d.get('unit', '')}", T.BODY, T.INK, True)
     put_bottom(s, d)
@@ -188,7 +217,7 @@ def process(prs, d):
 def prompt(prs, d):
     s = slide_base(prs, d)
     put_lead(s, d)
-    rect(s, T.MX, T.PROMPT_Y, T.CW, T.PROMPT_H, T.SURFACE, T.LINE)
+    soft_rect(s, T.MX, T.PROMPT_Y, T.CW, T.PROMPT_H, T.SURFACE)
     textbox(s, T.MX+T.PAD, T.PROMPT_Y+T.PAD, T.CW-2*T.PAD, T.PROMPT_H-2*T.PAD,
             d['prompt'], T.BODY_SM, T.INK, mono=False)
     textbox(s, T.MX, T.PROMPT_FOOT_Y, T.CW, T.PANEL_TITLE_H, d.get('bottom', ''), T.CAPTION, T.MUTED)

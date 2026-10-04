@@ -4,6 +4,7 @@ import sys
 from collections import Counter
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
+from slides_data import SLIDES
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PPTX = os.path.join(ROOT, 'output', 'daeryzen-ai-office-20261007.pptx')
@@ -12,15 +13,16 @@ OUT = os.path.join(ROOT, 'output', 'qa-contact')
 
 def inspect():
     prs = Presentation(PPTX)
-    assert len(prs.slides) == 140
+    assert len(prs.slides) == len(SLIDES)
     titles = []
     issues = []
     sizes = []
     for index, slide in enumerate(prs.slides, 1):
-        title = next((sh.text.strip() for sh in slide.shapes if sh.has_text_frame and sh.text.strip()), '')
+        title = SLIDES[index-1]['title']
+        slide_text = '\n'.join(sh.text for sh in slide.shapes if sh.has_text_frame)
         titles.append(title)
-        if not title:
-            issues.append(f'{index}: 제목 없음')
+        if not title or title not in slide_text:
+            issues.append(f'{index}: 제목 누락')
         for sh in slide.shapes:
             if sh.left < 0 or sh.top < 0 or sh.left + sh.width > prs.slide_width + 1000 or sh.top + sh.height > prs.slide_height + 1000:
                 issues.append(f'{index}: 슬라이드 밖 도형')
@@ -40,10 +42,10 @@ def contact():
     os.makedirs(OUT, exist_ok=True)
     paths = sorted(os.path.join(PAGES, name) for name in os.listdir(PAGES)
                    if name.startswith('page-') and name.endswith('.jpg'))
-    assert len(paths) == 140, len(paths)
+    assert len(paths) == len(SLIDES), len(paths)
     cell_w = 400
     cell_h = 270
-    for group in range(7):
+    for group in range((len(paths)+19)//20):
         canvas = Image.new('RGB', (cell_w*5, cell_h*4), 'white')
         draw = ImageDraw.Draw(canvas)
         for slot, path in enumerate(paths[group*20:(group+1)*20]):

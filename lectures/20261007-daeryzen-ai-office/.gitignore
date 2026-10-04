@@ -1,9 +1,11 @@
 output/qa-pages/
 output/qa-contact/
+output/qa-pdf/
 output/qa-workbook-*.png
 output/lo-profile/
-build_materials/node_modules/
+build_materials/node_modules
 materials/01-data/*.inspect.ndjson
 docs/00-email-brief.md
 docs/03-survey-design.md
 docs/05-email-reply.md
+output/~$*.pptx

@@ -1,0 +1,8 @@
+flowchart LR
+    A[context: 목적·금지] --> C[AI 작업]
+    B[inputs: 가상 자료] --> C
+    C --> D[work: 계산·메모]
+    D --> E[outputs: 보고서 초안]
+    E --> F{사람 검수}
+    F -- 수정 --> C
+    F -- 승인 --> G[decisions: 승인 기록]

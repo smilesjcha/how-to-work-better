@@ -13,6 +13,7 @@ function parseCsv(text) {
 
 const sales = parseCsv(await fs.readFile(path.join(out, 'sales-quality-sample.csv'), 'utf8'));
 const targets = parseCsv(await fs.readFile(path.join(out, 'july-targets.csv'), 'utf8'));
+const weeklyRows = parseCsv(await fs.readFile(path.join(out, 'weekly-ops-sample.csv'), 'utf8'));
 const targetByProduct = Object.fromEntries(targets.slice(1).map(row => [row[1], Number(row[2])]));
 const productNames = { A_plain: 'A 플레인', B_string: 'B 스트링', C_yogurt: 'C 요거트' };
 const inputs = sales.slice(1).map(row => [row[0], productNames[row[1]], Number(row[2]), Number(row[3]), row[0] === '2026-07' ? targetByProduct[row[1]] : null]);
@@ -20,8 +21,10 @@ const inputs = sales.slice(1).map(row => [row[0], productNames[row[1]], Number(r
 const wb = Workbook.create();
 const summary = wb.worksheets.add('Summary');
 const source = wb.worksheets.add('Inputs');
+const weekly = wb.worksheets.add('Weekly detail');
 summary.showGridLines = false;
 source.showGridLines = false;
+weekly.showGridLines = false;
 
 source.getRange('A1').values = [['한빛유업 가상 실습 데이터']];
 source.getRange('A2').values = [['수치는 교육용 가상 값입니다. 실제 기업 데이터가 아닙니다.']];
@@ -36,6 +39,24 @@ source.getRange('B1:B9').format.columnWidth = 19;
 source.getRange('C1:E9').format.columnWidth = 20;
 source.getRange('C4:E9').setNumberFormat('#,##0');
 source.freezePanes.freezeRows(3);
+
+weekly.getRange('A1').values = [['주차별 운영 원장 · 교육용 가상 데이터']];
+weekly.getRange('A2').values = [['월별 요약과 같은 합계로 설계한 심화용 24행 자료입니다. 실제 거래·고객·기업 정보가 아닙니다.']];
+weekly.getRange('A3:G3').values = [['월', '월내 주차', '집계 배치 ID', '제품', '판매 수량(개)', '반품 접수(건)', '마감 상태']];
+weekly.getRange('A4:G27').values = weeklyRows.slice(1).map(row => [row[0], Number(row[1]), row[2], productNames[row[3]], Number(row[4]), Number(row[5]), row[6]]);
+weekly.getRange('A1:G27').format.font = { name: 'Arial', size: 10, color: '#17191C' };
+weekly.getRange('A1').format.font = { name: 'Arial', size: 14, bold: true, color: '#17191C' };
+weekly.getRange('A3:G3').format = { fill: '#101B2A', font: { name: 'Arial', size: 10, bold: true, color: '#FFFFFF' } };
+weekly.getRange('A4:G27').format.rowHeight = 22;
+weekly.getRange('A1:B27').format.columnWidth = 17;
+weekly.getRange('C1:C27').format.columnWidth = 21;
+weekly.getRange('D1:D27').format.columnWidth = 19;
+weekly.getRange('E1:F27').format.columnWidth = 20;
+weekly.getRange('G1:G27').format.columnWidth = 16;
+weekly.getRange('E4:F27').setNumberFormat('#,##0');
+weekly.getRange('B4:B27').format.horizontalAlignment = 'center';
+weekly.getRange('G4:G27').format.horizontalAlignment = 'center';
+weekly.freezePanes.freezeRows(3);
 
 summary.getRange('A1').values = [['월별 판매·반품 요약']];
 summary.getRange('A2').values = [['교육용 가상 데이터 · 반품률 = 반품 접수 건수 ÷ 판매 수량']];
@@ -57,14 +78,25 @@ for (let row = 9; row <= 11; row++) {
   summary.getRange(`E${row}`).formulas = [[`=SUMIFS(Inputs!$C$4:$C$9,Inputs!$A$4:$A$9,"2026-07",Inputs!$B$4:$B$9,A${row})/D${row}`]];
 }
 summary.getRange('A13').values = [['원인·유형·안전성·법규 적합성은 이 파일로 판단할 수 없습니다.']];
-summary.getRange('A1:E13').format.font = { name: 'Arial', size: 10, color: '#17212B' };
+summary.getRange('A15:E15').values = [['월', '월별 판매(개)', '주차 합계(개)', '판매 차이(개)', '반품 차이(건)']];
+summary.getRange('A16:A17').values = [['2026-06'], ['2026-07']];
+for (let row = 16; row <= 17; row++) {
+  const sourceRow = row - 11;
+  summary.getRange(`B${row}`).formulas = [[`=B${sourceRow}`]];
+  summary.getRange(`C${row}`).formulas = [[`=SUMIFS('Weekly detail'!$E$4:$E$27,'Weekly detail'!$A$4:$A$27,A${row})`]];
+  summary.getRange(`D${row}`).formulas = [[`=B${row}-C${row}`]];
+  summary.getRange(`E${row}`).formulas = [[`=C${sourceRow}-SUMIFS('Weekly detail'!$F$4:$F$27,'Weekly detail'!$A$4:$A$27,A${row})`]];
+}
+summary.getRange('A1:E17').format.font = { name: 'Arial', size: 10, color: '#17212B' };
 summary.getRange('A1').format.font = { name: 'Arial', size: 14, bold: true, color: '#17212B' };
 summary.getRange('A4:E4').format = { fill: '#0B1F3A', font: { name: 'Arial', size: 10, bold: true, color: '#FFFFFF' } };
 summary.getRange('A8:E8').format = { fill: '#0B1F3A', font: { name: 'Arial', size: 10, bold: true, color: '#FFFFFF' } };
+summary.getRange('A15:E15').format = { fill: '#101B2A', font: { name: 'Arial', size: 10, bold: true, color: '#FFFFFF' } };
 summary.getRange('A4:E11').format.rowHeight = 25;
-summary.getRange('A1:A13').format.columnWidth = 17;
-summary.getRange('B1:C13').format.columnWidth = 20;
-summary.getRange('D1:E13').format.columnWidth = 21;
+summary.getRange('A15:E17').format.rowHeight = 25;
+summary.getRange('A1:A17').format.columnWidth = 17;
+summary.getRange('B1:C17').format.columnWidth = 20;
+summary.getRange('D1:E17').format.columnWidth = 21;
 summary.getRange('B5:C6').setNumberFormat('#,##0');
 summary.getRange('D5:D6').setNumberFormat('0.00%');
 summary.getRange('E6').setNumberFormat('0.0%');
@@ -72,13 +104,14 @@ summary.getRange('E5').format.horizontalAlignment = 'center';
 summary.getRange('B9:C11').setNumberFormat('0.00%');
 summary.getRange('D9:D11').setNumberFormat('#,##0');
 summary.getRange('E9:E11').setNumberFormat('0.0%');
+summary.getRange('B16:E17').setNumberFormat('#,##0');
 
 wb.recalculate();
-const check = await wb.inspect({ kind: 'table', range: 'Summary!A4:E11', include: 'values,formulas', tableMaxRows: 12, tableMaxCols: 5, maxChars: 7000 });
+const check = await wb.inspect({ kind: 'table', range: 'Summary!A4:E17', include: 'values,formulas', tableMaxRows: 18, tableMaxCols: 5, maxChars: 11000 });
 console.log(check.ndjson);
 const errors = await wb.inspect({ kind: 'match', searchTerm: '#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!', options: { useRegex: true, maxResults: 30 }, maxChars: 2000 });
 console.log(errors.ndjson);
-for (const name of ['Summary', 'Inputs']) {
+for (const name of ['Summary', 'Inputs', 'Weekly detail']) {
   const preview = await wb.render({ sheetName: name, autoCrop: 'all', scale: 1.4, format: 'png' });
   await fs.writeFile(path.join(root, 'output', `qa-workbook-${name.toLowerCase()}.png`), new Uint8Array(await preview.arrayBuffer()));
 }
