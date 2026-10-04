@@ -1,0 +1,7 @@
+month,product,sold_units,return_cases
+2026-06,A_plain,1200,12
+2026-06,B_string,800,8
+2026-06,C_yogurt,500,10
+2026-07,A_plain,1320,11
+2026-07,B_string,760,12
+2026-07,C_yogurt,550,11
