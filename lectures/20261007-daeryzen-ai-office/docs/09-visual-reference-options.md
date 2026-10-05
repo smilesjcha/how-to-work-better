@@ -9,6 +9,6 @@
 | 83·95 | [NIST AI 600-1 공식 PDF](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf) 표지·목차 | 위험 가이드의 원문 식별 | PDF 화면 캡처 삽입 완료, 발표자 노트에 출처 |
 | 126·133 | 입력·작업·결정 폴더 흐름 | PM·개발·행정에 공통인 파일 역할 | PPT 편집형 도형, `design/agent-folder-flow.mmd` 원문 |
 | 132 | [OpenAI ChatGPT macOS 앱 도움말](https://help.openai.com/en/collections/9403039-macosapp), [Codex 소개](https://developers.openai.com/learn/codex) | 실제 앱 화면의 작업 위치 | 강의 당일 계정 화면 직접 시연 권장. 버전이 바뀌므로 정적 캡처는 보류 |
-| 137 | [Claude Code Desktop 공식 문서](https://code.claude.com/docs/en/desktop) | 동일 과제 비교의 화면 기준 | 강의 당일 계정 화면 직접 시연 권장. 버전이 바뀌므로 정적 캡처는 보류 |
+| 142–145 | Codex 또는 Claude Code의 실제 파일 작업 화면 | 입력·작업 기록·결과물 분리 확인 | 가능한 도구 하나만 시연. 두 도구의 성능·요금 비교 제외 |
 
 이미지 추가 후보: 유제품 공정 사진은 내용 이해보다 장식 효과가 크다. 실제 기업 공정으로 오해될 수 있으므로 이번 덱에는 넣지 않는다. 제품 UI는 공식 문서 또는 강사 계정의 비식별 데모 화면만 사용한다. 외부 이미지를 넣을 경우 저작권·공개 범위와 화면의 최신성을 다시 확인한다.

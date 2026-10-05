@@ -4,10 +4,49 @@ from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.parts.image import Image
 from pptx.oxml.xmlchemy import OxmlElement
+from PIL import ImageFont
+from functools import lru_cache
 import theme as T
 
 TOTAL = 0
 ASSETS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+
+
+@lru_cache(maxsize=16)
+def _measure_font(size):
+    return ImageFont.truetype(T.FONT_PATH, round(size.pt*T.MEASURE_SCALE))
+
+
+def wrap_text(value, width, size):
+    """실측 폭으로 줄바꿈. 렌더러 차이를 흡수할 안전 여유를 둔다."""
+    font = _measure_font(size)
+    limit = width/12700*T.MEASURE_SCALE*T.WRAP_SAFE
+    lines = []
+    for paragraph in str(value).split('\n'):
+        current = ''
+        for char in paragraph:
+            if current and font.getlength(current+char) > limit:
+                # 가능한 한 어절 단위로 나누되 긴 한 단어는 폭을 우선한다.
+                if ' ' in current and font.getlength(current.rsplit(' ', 1)[0]) > limit/2:
+                    before, after = current.rsplit(' ', 1)
+                    lines.append(before.rstrip()); current = after+char
+                else:
+                    lines.append(current.rstrip()); current = char.lstrip()
+            else:
+                current += char
+        lines.append(current.rstrip())
+    return '\n'.join(lines)
+
+
+def prompt_rows(items, width):
+    """여러 줄 요청문에 필요한 높이를 배분해 구분선과 충돌을 막는다."""
+    wrapped = [wrap_text(item, width, T.PROMPT_TEXT) for item in items]
+    heights = [max(T.PROMPT_MIN_H,
+                   (text.count('\n')+1)*T.PROMPT_TEXT*T.TEXT_LEADING+2*T.PROMPT_PAD_Y)
+               for text in wrapped]
+    if sum(heights) > T.STAGE_H:
+        raise ValueError('프롬프트가 본문 높이를 초과합니다. 요청 항목을 분할하세요.')
+    return list(zip(wrapped, heights))
 
 
 def textbox(slide, x, y, w, h, value, size=T.BODY, color=T.INK, bold=False,
@@ -343,29 +382,38 @@ def prompt(prs, d):
     s = base(prs, d); lead(s, d)
     items = d['prompt'].split('\n')
     mode = d['_composition']
+    left_w = T.CW-T.WIDE_LEFT/2-T.GAP
+    if mode == 'annotated':
+        try:
+            rows = prompt_rows(items, left_w-2*T.EDITORIAL_INSET)
+            if sum(height for _, height in rows) > T.STAGE_H-2*T.EDITORIAL_INSET:
+                mode = 'source'
+        except ValueError:
+            mode = 'source'
     if mode == 'source':
-        row_h = min(T.PROMPT_LINE_H, T.STAGE_H/max(1, len(items)))
-        for i, item in enumerate(items):
-            y = T.STAGE_Y+i*row_h; line(s, T.MX, y, T.CW)
-            textbox(s, T.MX, y+T.TABLE_PAD,
-                    T.PROMPT_LABEL_W-T.TABLE_PAD, row_h-T.TABLE_PAD,
+        rows = prompt_rows(items, T.PROMPT_BODY_W)
+        y = T.STAGE_Y
+        for i, (item, row_h) in enumerate(rows):
+            line(s, T.MX, y, T.CW)
+            textbox(s, T.MX, y+T.PROMPT_PAD_Y,
+                    T.PROMPT_LABEL_W-T.TABLE_PAD, row_h-2*T.PROMPT_PAD_Y,
                     f'{i+1:02d}', T.KICKER, T.GOOD, True,
-                    anchor=MSO_ANCHOR.MIDDLE)
-            textbox(s, T.PROMPT_BODY_X, y+T.TABLE_PAD,
-                    T.PROMPT_BODY_W, row_h-T.TABLE_PAD,
-                    item, T.PROMPT_TEXT, anchor=MSO_ANCHOR.MIDDLE)
-        line(s, T.MX, T.STAGE_Y+len(items)*row_h, T.CW)
+                    anchor=MSO_ANCHOR.TOP)
+            textbox(s, T.PROMPT_BODY_X, y+T.PROMPT_PAD_Y,
+                    T.PROMPT_BODY_W, row_h-2*T.PROMPT_PAD_Y,
+                    item, T.PROMPT_TEXT)
+            y += row_h
+        line(s, T.MX, y, T.CW)
     else:
-        left_w = T.CW-T.WIDE_LEFT/2-T.GAP
         rect(s, T.MX, T.STAGE_Y, left_w, T.STAGE_H, T.SURFACE)
-        row_h = (T.STAGE_H-2*T.EDITORIAL_INSET)/max(1, len(items))
-        for i, item in enumerate(items):
-            y = T.STAGE_Y+T.EDITORIAL_INSET+i*row_h
-            textbox(s, T.MX+T.EDITORIAL_INSET, y,
-                    left_w-2*T.EDITORIAL_INSET, row_h,
-                    item, T.PROMPT_TEXT, anchor=MSO_ANCHOR.MIDDLE)
-            if i < len(items)-1:
-                line(s, T.MX+T.EDITORIAL_INSET, y+row_h,
+        y = T.STAGE_Y+T.EDITORIAL_INSET
+        for i, (item, row_h) in enumerate(rows):
+            textbox(s, T.MX+T.EDITORIAL_INSET, y+T.PROMPT_PAD_Y,
+                    left_w-2*T.EDITORIAL_INSET, row_h-2*T.PROMPT_PAD_Y,
+                    item, T.PROMPT_TEXT)
+            y += row_h
+            if i < len(rows)-1:
+                line(s, T.MX+T.EDITORIAL_INSET, y,
                      left_w-2*T.EDITORIAL_INSET)
         x = T.MX+left_w+T.GAP; w = T.CW-left_w-T.GAP
         textbox(s, x, T.STAGE_Y, w, T.LEAD_H,
@@ -374,7 +422,9 @@ def prompt(prs, d):
         picks = items[1:4] if len(items) >= 4 else items[:3]
         for i, item in enumerate(picks):
             stripped = item.strip()
-            if stripped.startswith('[') and ']' in stripped:
+            if d.get('labels'):
+                label = d['labels'][i]
+            elif stripped.startswith('[') and ']' in stripped:
                 label = stripped[1:stripped.index(']')]
             elif ':' in stripped and stripped.index(':') <= 12:
                 label = stripped.split(':', 1)[0]
@@ -465,8 +515,23 @@ def profile(prs, d):
     s = base(prs, d); lead(s, d)
     left_w = T.CW-T.PHOTO_W-T.GAP
     line(s, T.MX, T.STAGE_Y, left_w, T.GOOD, T.RULE_THICK)
-    textbox(s, T.MX, T.STAGE_Y+T.EDITORIAL_INSET,
-            left_w, T.STAGE_H-T.EDITORIAL_INSET, d['body'], T.BODY_SM)
+    if d.get('groups'):
+        y = T.STAGE_Y+T.EDITORIAL_INSET
+        textbox(s, T.MX, y, left_w, T.PROFILE_NAME_H,
+                d['name'], T.PROFILE_NAME, T.INK, True)
+        y += T.PROFILE_NAME_H+T.PROFILE_GROUP_GAP
+        for label, rows in d['groups']:
+            textbox(s, T.MX, y, left_w, T.PROFILE_LABEL_H,
+                    label, T.KICKER, T.GOOD, True)
+            y += T.PROFILE_LABEL_H+T.PROFILE_GROUP_GAP/2
+            for row in rows:
+                textbox(s, T.MX, y, left_w, T.PROFILE_ROW_H,
+                        '• '+row, T.BODY_SM)
+                y += T.PROFILE_ROW_H
+            y += T.PROFILE_GROUP_GAP
+    else:
+        textbox(s, T.MX, T.STAGE_Y+T.EDITORIAL_INSET,
+                left_w, T.STAGE_H-T.EDITORIAL_INSET, d['body'], T.BODY_SM)
     x = T.MX+left_w+T.GAP
     rect(s, x, T.STAGE_Y, T.PHOTO_W, T.PHOTO_H, T.SURFACE)
     path = os.path.join(ASSETS, d['path'])
@@ -474,6 +539,243 @@ def profile(prs, d):
     textbox(s, x, T.STAGE_Y+T.PHOTO_H+T.PAD,
             T.PHOTO_W, T.LEAD_H, 'KT 「모두의 AI」 사업 출범식', T.CAPTION, T.MUTED)
     bottom(s, d); return s
+
+
+def native_table(s, x, y, w, headers, rows, fractions, row_h=T.DOC_ROW_H,
+                 head_h=T.DOC_HEAD_H, size=T.DOC_BODY, numeric=(), total=False):
+    """숫자 정렬·단위·행의 의미를 보존하는 편집 가능한 데이터 표."""
+    tab = s.shapes.add_table(len(rows)+1, len(headers), int(x), int(y),
+                             int(w), int(head_h+len(rows)*row_h)).table
+    for column, fraction in zip(tab.columns, fractions):
+        column.width = int(w*fraction/sum(fractions))
+    for ri, values in enumerate([headers]+rows):
+        tab.rows[ri].height = int(head_h if ri == 0 else row_h)
+        for ci, value in enumerate(values):
+            cell = tab.cell(ri, ci)
+            cell.margin_left = cell.margin_right = T.TABLE_PAD
+            cell.margin_top = cell.margin_bottom = int(T.TABLE_PAD/2)
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
+            cell.fill.solid()
+            is_total = total and ri == len(rows)
+            cell.fill.fore_color.rgb = T.SOFT_GREEN if is_total else (T.SURFACE if ri == 0 else T.PAPER)
+            tcpr = cell._tc.get_or_add_tcPr()
+            for name in ('lnL', 'lnR', 'lnT', 'lnB'):
+                for old in list(tcpr):
+                    if old.tag.endswith('}'+name): tcpr.remove(old)
+                border = OxmlElement('a:'+name); border.set('w', str(int(T.STROKE)))
+                color = OxmlElement('a:solidFill' if name == 'lnB' else 'a:noFill')
+                if name == 'lnB':
+                    rgb = OxmlElement('a:srgbClr'); rgb.set('val', str(T.LINE)); color.append(rgb)
+                border.append(color); tcpr.append(border)
+            tf = cell.text_frame; tf.clear(); tf.word_wrap = True
+            tf.auto_size = MSO_AUTO_SIZE.NONE
+            for pi, text in enumerate(str(value).split('\n')):
+                p = tf.paragraphs[0] if pi == 0 else tf.add_paragraph()
+                p.line_spacing = T.BODY_LINES; p.space_before = p.space_after = 0
+                p.alignment = PP_ALIGN.RIGHT if ci in numeric else PP_ALIGN.LEFT
+                run = p.add_run(); run.text = text
+                run.font.name = T.FONT_HEAVY if ri == 0 or is_total else T.FONT
+                run.font.size = size; run.font.bold = ri == 0 or is_total
+                run.font.color.rgb = T.GOOD if is_total else (T.MUTED if ri == 0 else T.INK)
+    return tab
+
+
+def kpis(s, items, x=T.MX, y=T.STAGE_Y, w=T.CW, h=T.DOC_KPI_H):
+    col_w = w/len(items)
+    for i, (label, value, context) in enumerate(items):
+        xx = x+i*col_w
+        if i: vertical(s, xx-T.DOC_INSET, y, h, T.LINE)
+        textbox(s, xx, y, col_w-T.DOC_GAP, T.PROFILE_LABEL_H,
+                label, T.DOC_LABEL, T.MUTED)
+        textbox(s, xx, y+T.PROFILE_LABEL_H+T.PROFILE_GROUP_GAP/2,
+                col_w-T.DOC_GAP, T.PROFILE_NAME_H,
+                value, T.DOC_VALUE, T.INK, True)
+        if context:
+            textbox(s, xx, y+h-T.PROFILE_LABEL_H, col_w-T.DOC_GAP,
+                    T.PROFILE_LABEL_H, context, T.DOC_LABEL, T.GOOD)
+
+
+def summary_sheet(prs, d):
+    s = base(prs, d); lead(s, d)
+    kpis(s, d['metrics'])
+    y = T.STAGE_Y+T.DOC_KPI_H+T.DOC_GAP
+    native_table(s, T.MX, y, T.CW, d['headers'], d['rows'], d['widths'],
+                 row_h=T.DOC_ROW_H, head_h=T.GANTT_HEAD_H,
+                 size=T.TABLE_COMPACT, numeric=range(1, len(d['headers'])), total=True)
+    textbox(s, T.MX, T.STAGE_BOTTOM-T.PROFILE_ROW_H, T.CW, T.PROFILE_ROW_H,
+            d['definition'], T.DOC_SMALL, T.MUTED)
+    return s
+
+
+def report(prs, d):
+    s = base(prs, d); lead(s, d)
+    rect(s, T.MX, T.STAGE_Y, T.CW, T.DOC_CONCLUSION_H, T.NAVY, rounded=True)
+    textbox(s, T.MX+T.DOC_INSET, T.STAGE_Y+T.DOC_INSET,
+            T.CW-2*T.DOC_INSET, T.PROFILE_LABEL_H, '결정 요청', T.DOC_LABEL, T.WARM, True)
+    textbox(s, T.MX+T.DOC_INSET, T.STAGE_Y+T.PROFILE_LABEL_H+T.DOC_INSET,
+            T.CW-2*T.DOC_INSET, T.PROFILE_NAME_H, d['conclusion'], T.BODY, T.WHITE)
+    y = T.STAGE_Y+T.DOC_CONCLUSION_H+T.DOC_GAP
+    lw = (T.CW-T.DOC_GAP)*T.DOC_LEFT_RATIO
+    native_table(s, T.MX, y, lw, d['headers'], d['rows'], d['widths'],
+                 numeric=(1, 2), head_h=T.GANTT_HEAD_H)
+    x = T.MX+lw+T.DOC_GAP; w = T.CW-lw-T.DOC_GAP
+    vertical(s, x, y, T.STAGE_BOTTOM-y-T.DOC_BOTTOM_H)
+    x += T.DOC_INSET; w -= T.DOC_INSET
+    for i, (label, body) in enumerate(d['actions']):
+        yy = y+i*(T.DOC_BLOCK_BODY_H+T.DOC_BLOCK_GAP)
+        textbox(s, x, yy, w, T.DOC_BLOCK_TITLE_H, label, T.DOC_BODY, T.GOOD, True)
+        textbox(s, x, yy+T.DOC_BLOCK_TITLE_H, w, T.DOC_BLOCK_BODY_H-T.DOC_BLOCK_TITLE_H,
+                body, T.DOC_BODY)
+    textbox(s, T.MX, T.STAGE_BOTTOM-T.DOC_BOTTOM_H/2, T.CW,
+            T.DOC_BOTTOM_H/2, d['definition'], T.DOC_SMALL, T.MUTED)
+    return s
+
+
+def gantt(prs, d):
+    s = base(prs, d); lead(s, d)
+    meta_w = T.CW*T.GANTT_META_RATIO; week_w = (T.CW-meta_w)/len(d['weeks'])
+    widths = [T.CW*f for f in T.GANTT_COLS]
+    headers = ['ID', '작업', '담당 역할', '선행', '완료 산출물']
+    y = T.STAGE_Y
+    rect(s, T.MX, y, T.CW, T.GANTT_HEAD_H, T.SURFACE)
+    x = T.MX
+    for head, w in zip(headers, widths):
+        textbox(s, x+T.TABLE_PAD, y+T.TABLE_PAD, w-2*T.TABLE_PAD,
+                T.GANTT_HEAD_H-2*T.TABLE_PAD, head, T.DOC_SMALL, T.MUTED, True,
+                anchor=MSO_ANCHOR.MIDDLE)
+        x += w
+    for i, week in enumerate(d['weeks']):
+        textbox(s, T.MX+meta_w+i*week_w, y+T.TABLE_PAD, week_w,
+                T.GANTT_HEAD_H-2*T.TABLE_PAD, week, T.DOC_SMALL, T.MUTED, True,
+                align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    for ri, row in enumerate(d['rows']):
+        yy = y+T.GANTT_HEAD_H+ri*T.GANTT_ROW_H
+        if ri % 2 == 0: rect(s, T.MX, yy, T.CW, T.GANTT_ROW_H, T.SURFACE)
+        x = T.MX
+        for value, w in zip(row[:5], widths):
+            textbox(s, x+T.TABLE_PAD, yy+T.TABLE_PAD, w-2*T.TABLE_PAD,
+                    T.GANTT_ROW_H-2*T.TABLE_PAD, value, T.DOC_SMALL,
+                    T.INK, anchor=MSO_ANCHOR.MIDDLE)
+            x += w
+        for wi in range(len(d['weeks'])):
+            vertical(s, T.MX+meta_w+wi*week_w, yy, T.GANTT_ROW_H, T.LINE)
+        start, end = row[5:7]
+        rect(s, T.MX+meta_w+start*week_w+T.TABLE_PAD,
+             yy+(T.GANTT_ROW_H-T.GANTT_BAR_H)/2,
+             (end-start+1)*week_w-2*T.TABLE_PAD,
+             T.GANTT_BAR_H, T.GOOD if ri == len(d['rows'])-1 else T.NAVY, rounded=True)
+        line(s, T.MX, yy+T.GANTT_ROW_H, T.CW)
+    yy = T.STAGE_BOTTOM-T.DOC_BOTTOM_H
+    line(s, T.MX, yy, T.CW, T.GOOD)
+    textbox(s, T.MX, yy+T.DOC_INSET, T.CW, T.DOC_BOTTOM_H-T.DOC_INSET,
+            d['decision'], T.DOC_BODY)
+    return s
+
+
+def proposal(prs, d):
+    s = base(prs, d); lead(s, d)
+    rect(s, T.MX, T.STAGE_Y, T.CW, T.DOC_BAND_H, T.SOFT_GREEN, rounded=True)
+    textbox(s, T.MX+T.DOC_INSET, T.STAGE_Y+T.DOC_INSET,
+            T.CW-2*T.DOC_INSET, T.DOC_BAND_H-2*T.DOC_INSET,
+            d['decision'], T.BODY, T.GOOD, True)
+    y = T.STAGE_Y+T.DOC_BAND_H+T.DOC_GAP
+    w = (T.CW-T.DOC_GAP*2)/2
+    vertical(s, T.MX+w+T.DOC_GAP, y, T.STAGE_BOTTOM-y-T.DOC_BOTTOM_H)
+    for i, (label, body) in enumerate(d['blocks']):
+        x = T.MX+(i%2)*(w+2*T.DOC_GAP)
+        yy = y+(i//2)*(T.DOC_BLOCK_BODY_H+T.DOC_BLOCK_GAP)
+        textbox(s, x, yy, w, T.DOC_BLOCK_TITLE_H, label, T.DOC_BODY, T.INK, True)
+        textbox(s, x, yy+T.DOC_BLOCK_TITLE_H+T.TABLE_PAD,
+                w, T.DOC_BLOCK_BODY_H-T.DOC_BLOCK_TITLE_H, body, T.DOC_BODY, T.MUTED)
+    line(s, T.MX, T.STAGE_BOTTOM-T.DOC_BOTTOM_H, T.CW)
+    textbox(s, T.MX, T.STAGE_BOTTOM-T.DOC_BOTTOM_H+T.DOC_INSET,
+            T.CW, T.DOC_BOTTOM_H-T.DOC_INSET, d['close'], T.DOC_BODY)
+    return s
+
+
+def prd(prs, d):
+    s = base(prs, d); lead(s, d)
+    if d.get('rows'):
+        native_table(s, T.MX, T.STAGE_Y, T.CW, d['headers'], d['rows'], d['widths'],
+                     row_h=(T.STAGE_H-T.DOC_BOTTOM_H-T.DOC_SPEC_FOOT_GAP-T.GANTT_HEAD_H)/len(d['rows']),
+                     head_h=T.GANTT_HEAD_H, size=T.TABLE_COMPACT)
+    else:
+        width = (T.CW-T.DOC_GAP)/2
+        for i, (label, body) in enumerate(d['scope']):
+            x = T.MX+i*(width+T.DOC_GAP)
+            textbox(s, x, T.STAGE_Y, width, T.DOC_BLOCK_TITLE_H,
+                    label, T.DOC_BODY, T.GOOD, True)
+            textbox(s, x, T.STAGE_Y+T.DOC_BLOCK_TITLE_H,
+                    width, T.DOC_CONCLUSION_H-T.DOC_BLOCK_TITLE_H,
+                    body, T.DOC_BODY)
+        y = T.STAGE_Y+T.DOC_CONCLUSION_H+T.DOC_GAP
+        node_w = (T.CW-(len(d['flow'])-1)*T.DOC_FLOW_ARROW_W)/len(d['flow'])
+        for i, label in enumerate(d['flow']):
+            x = T.MX+i*(node_w+T.DOC_FLOW_ARROW_W)
+            rect(s, x, y, node_w, T.DOC_FLOW_H, T.NAVY, rounded=True)
+            textbox(s, x+T.DOC_INSET, y+T.DOC_INSET,
+                    node_w-2*T.DOC_INSET, T.DOC_FLOW_H-2*T.DOC_INSET,
+                    label, T.DOC_BODY, T.WHITE, True, align=PP_ALIGN.CENTER,
+                    anchor=MSO_ANCHOR.MIDDLE)
+            if i < len(d['flow'])-1:
+                textbox(s, x+node_w, y+T.DOC_INSET, T.DOC_FLOW_ARROW_W,
+                        T.DOC_FLOW_H-2*T.DOC_INSET, '→', T.DOC_BODY, T.GOOD,
+                        align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        y += T.DOC_FLOW_H+T.DOC_GAP
+        for i, (label, body) in enumerate(d['features']):
+            x = T.MX+i*(width+T.DOC_GAP)
+            line(s, x, y, width)
+            textbox(s, x, y+T.DOC_INSET, width, T.DOC_BLOCK_TITLE_H,
+                    label, T.DOC_BODY, T.INK, True)
+            textbox(s, x, y+T.DOC_INSET+T.DOC_BLOCK_TITLE_H,
+                    width, T.DOC_BLOCK_BODY_H-T.DOC_BLOCK_TITLE_H,
+                    body, T.DOC_BODY, T.MUTED)
+    if d.get('close'):
+        textbox(s, T.MX, T.STAGE_BOTTOM-T.DOC_BOTTOM_H+T.DOC_INSET,
+                T.CW, T.DOC_BOTTOM_H-T.DOC_INSET, d['close'], T.DOC_BODY, T.GOOD)
+    return s
+
+
+def dashboard(prs, d):
+    s = base(prs, d); lead(s, d)
+    kpis(s, d['metrics'], h=T.DASH_KPI_H)
+    y = T.STAGE_Y+T.DASH_KPI_H+T.DOC_GAP
+    lw = (T.CW-T.DOC_GAP)*T.DASH_PLOT_RATIO
+    textbox(s, T.MX, y, lw, T.DOC_BLOCK_TITLE_H,
+            '제품별 목표 달성률', T.DOC_BODY, T.INK, True)
+    by = y+T.DOC_BLOCK_TITLE_H+T.DOC_GAP
+    bx = T.MX+T.DASH_LABEL_W
+    bw = lw-T.DASH_LABEL_W-T.DASH_VALUE_W-T.DOC_GAP
+    target_x = bx+bw/T.DASH_PLOT_MAX
+    for i, (label, value) in enumerate(d['bars']):
+        yy = by+i*T.DASH_ROW_H
+        textbox(s, T.MX, yy, T.DASH_LABEL_W, T.DASH_ROW_H,
+                label, T.DOC_BODY, anchor=MSO_ANCHOR.MIDDLE)
+        rect(s, bx, yy+(T.DASH_ROW_H-T.DASH_BAR_H)/2, bw,
+             T.DASH_BAR_H, T.PALE, rounded=True)
+        rect(s, bx, yy+(T.DASH_ROW_H-T.DASH_BAR_H)/2,
+             bw*value/T.DASH_PLOT_MAX, T.DASH_BAR_H,
+             T.GOOD if value >= 1 else T.NAVY, rounded=True)
+        textbox(s, bx+bw+T.TABLE_PAD, yy, T.DASH_VALUE_W,
+                T.DASH_ROW_H, f'{value*100:.1f}%', T.DOC_BODY,
+                T.INK, True, align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE)
+    vertical(s, target_x, by, len(d['bars'])*T.DASH_ROW_H, T.MUTED, T.STROKE)
+    axis_y = by+len(d['bars'])*T.DASH_ROW_H
+    textbox(s, bx, axis_y, T.DASH_VALUE_W, T.PROFILE_LABEL_H, '0%', T.DOC_LABEL, T.MUTED)
+    textbox(s, target_x-T.DASH_VALUE_W, axis_y, T.DASH_VALUE_W*2,
+            T.PROFILE_LABEL_H, '목표 100%', T.DOC_LABEL, T.MUTED, align=PP_ALIGN.CENTER)
+    x = T.MX+lw+T.DOC_GAP; w = T.CW-lw-T.DOC_GAP
+    vertical(s, x, y, T.DASH_DETAIL_H+T.DOC_GAP)
+    x += T.DOC_INSET; w -= T.DOC_INSET
+    textbox(s, x, y, w, T.DOC_BLOCK_TITLE_H, '추가 확인', T.DOC_BODY, T.GOOD, True)
+    for i, (label, action) in enumerate(d['queue']):
+        yy = y+T.DOC_BLOCK_TITLE_H+T.DOC_GAP+i*T.DOC_CONCLUSION_H
+        textbox(s, x, yy, w, T.DOC_BLOCK_TITLE_H, label, T.DOC_BODY, T.INK, True)
+        textbox(s, x, yy+T.DOC_BLOCK_TITLE_H, w,
+                T.DOC_CONCLUSION_H-T.DOC_BLOCK_TITLE_H, action, T.DOC_BODY, T.MUTED)
+    textbox(s, T.MX, T.STAGE_BOTTOM-T.PROFILE_ROW_H, T.CW, T.PROFILE_ROW_H,
+            d['definition'], T.DOC_SMALL, T.MUTED)
+    return s
 
 
 def pause(prs, d):
@@ -487,4 +789,4 @@ def pause(prs, d):
 
 
 TYPES = {name: globals()[name] for name in
-         'cover section triad compare chart table process prompt exercise image profile pause'.split()}
+         'cover section triad compare chart table process prompt exercise image profile summary_sheet report gantt proposal prd dashboard pause'.split()}

@@ -1,4 +1,4 @@
-"""140장 PDF의 콘택트시트와 PPTX 기본 품질 보고."""
+"""전 페이지 PDF 콘택트시트와 PPTX 기본 품질 보고."""
 import os
 import sys
 from collections import Counter
@@ -21,10 +21,17 @@ def inspect():
     sizes = []
     for index, slide in enumerate(prs.slides, 1):
         title = SLIDES[index-1]['title']
-        slide_text = '\n'.join(sh.text for sh in slide.shapes if sh.has_text_frame)
+        texts = [sh.text for sh in slide.shapes if sh.has_text_frame]
+        for sh in slide.shapes:
+            if sh.has_table:
+                texts.extend(cell.text for row in sh.table.rows for cell in row.cells)
+        slide_text = '\n'.join(texts)
         titles.append(title)
         if not title or title not in slide_text:
             issues.append(f'{index}: 제목 누락')
+        for phrase in ('2인 1조', '짝 실습', '강사 제공', '공식 입장이 아닌', 'Claude Code 비교'):
+            if phrase in slide_text:
+                issues.append(f'{index}: 수강생 불필요 문구 {phrase}')
         for sh in slide.shapes:
             if sh.left < 0 or sh.top < 0 or sh.left + sh.width > prs.slide_width + 1000 or sh.top + sh.height > prs.slide_height + 1000:
                 issues.append(f'{index}: 슬라이드 밖 도형')
